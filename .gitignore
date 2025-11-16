@@ -11,6 +11,9 @@ final
 __pycache__/
 *.pyc
 
+#Log files
+*.csv
+
 #Temporary files
 *~
 *.swp
