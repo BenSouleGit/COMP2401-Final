@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
+
 //Oh wait. I need to use room_init instead?
 struct Room* create_room(const char* name) {
 	struct Room* room = (struct Room*) malloc(sizeof(struct Room));	//Allocate memory for the room

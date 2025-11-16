@@ -21,28 +21,3 @@ struct House* create_house(void) {
 	
 	return house;
 }
-
-
-// Temporary test - remove later
-#include <stdio.h>
-
-int main() {
-    struct House* house = create_house();
-    if (house) {
-        printf("House created successfully!\n");
-        printf("Room count: %d\n", house->room_count);
-        printf("Starting room: %s\n", house->starting_room->name);
-        
-        // Test a connection
-        printf("Van connects to: ");
-        for (int i = 0; i < house->starting_room->num_connections; i++) {
-            printf("%s ", house->starting_room->connected_rooms[i]->name);
-        }
-        printf("\n");
-        
-        // Don't forget to free everything later!
-        free(house->hunters);
-        free(house);
-    }
-    return 0;
-}
