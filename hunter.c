@@ -28,35 +28,3 @@ struct Hunter* create_hunter(const char* name, int id, struct Room* starting_roo
 	
 	return hunter;
 }
-
-
-#include <stdio.h>
-
-// Temporary test main
-int main() {
-    // Create a test house and room first
-    struct House* house = create_house();
-    if (!house) {
-        printf("Failed to create house\n");
-        return 1;
-    }
-    
-    // Create a hunter
-    struct Hunter* hunter = create_hunter("Test Hunter", 123, house->starting_room, EV_EMF, &house->casefile);
-    if (hunter) {
-        printf("Hunter created successfully!\n");
-        printf("Name: %s, ID: %d, Device: %d\n", hunter->name, hunter->id, hunter->device);
-        printf("Current room: %s, Fear: %d, Boredom: %d\n", hunter->current_room->name, hunter->fear, hunter->boredom);
-        
-        // Clean up
-        free(hunter);
-    } else {
-        printf("Failed to create hunter\n");
-    }
-    
-    // Clean up house (you'll need cleanup functions later)
-    free(house->hunters);
-    free(house);
-    
-    return 0;
-}

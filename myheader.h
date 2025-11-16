@@ -57,15 +57,26 @@ bool room_has_evidence(struct Room* room, enum EvidenceType evidence);
 
 /**
 * @brief	Creates and initializes a hunter.
-* @param[]	name: The hunter's name.
-* @param[]	id: The hunter's unique id.
-* @param[]	starting_room: The room where the hunter begins.
-* @param[]	device: The evidence device the hunter carries.
-* @param[]	casefile: Pointer to the shared case file.
+* @param[in]	name: The hunter's name.
+* @param[in]	id: The hunter's unique id.
+* @param[in]	starting_room: The room where the hunter begins.
+* @param[in]	device: The evidence device the hunter carries.
+* @param[in]	casefile: Pointer to the shared case file.
 * @return	Pointer to the new hunter, or NULL on failure.
 */
 struct Hunter* create_hunter(const char* name, int id, struct Room* starting_room, enum EvidenceType device, struct CaseFile* casefile);
 
+/**
+* @brief		Creates and initializes a ghost.
+* @param[in, out]	house: The house where the ghost will be placed.
+* @return		Pointer to the new ghost, or NULL on failure.
+*/
+struct Ghost* create_ghost(struct House* house);
 
+/**
+* @brief		Executes one turn of ghost behaviour.
+* @param[in, out]	ghost: The ghost taking its turn.
+*/
+void ghost_take_turn(struct Ghost* ghost);
 
 #endif //MYHEADER_H
