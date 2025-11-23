@@ -4,18 +4,27 @@
 #include "defs.h"
 
 
-
-/**
-* @brief
-* @param[]
-* @return
-*/
-
 /**
 * @brief	Creates and initializes a house structure.
 * @return	Pointer to the new house, or NULL on failure.
 */
 struct House* create_house(void);
+
+/**
+* @brief	Checks if the simulation should end.
+* @param[in]	house: The house with hunters.
+* @param[in]	ghost: The ghost.
+* @return	true if simulation should end, false otherwise.
+*/
+bool check_game_over(struct House* house, struct Ghost* ghost);
+
+/**
+* @brief		Adds a hunter to the house's hunter array.
+* @param[in, out]	house: The house to add the hunter to.
+* @param[in]		hunter: The hunter to add.
+* @return		true if successful, false on failure.
+*/
+bool house_add_hunter(struct House* house, struct Hunter* hunter);
 
 /**
 * @brief		Adds evidence to the shared case file.

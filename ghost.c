@@ -31,7 +31,7 @@ struct Ghost* create_ghost(struct House* house) {
 	return ghost;
 }
 
-void ghost_take_turn(struct Ghost* ghost) {
+void ghost_take_turn(struct Ghost* ghost) {	
 	//Hunter check
 	if (ghost->current_room->num_hunters > 0) {
 		ghost->boredom = 0;	//Reset boredom
