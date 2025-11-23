@@ -91,6 +91,15 @@ struct Room {
 	//sem_t mutex;
 };
 
+//RoomStack node
+struct RoomNode {
+	struct Room* data;
+	struct RoomNode* next;
+};
+
+//RoomStack
+typedef struct RoomNode* RoomStack;
+
 struct Hunter {
 	//Hunter properties
 	char name[MAX_HUNTER_NAME];
@@ -98,10 +107,11 @@ struct Hunter {
 	int fear;
 	int boredom;
 	bool exited;
+	bool returning_to_van;
 	
 	//Room and path
 	struct Room* current_room;
-	struct RoomStack* path;
+	RoomStack path;
 	
 	//Log and evidence
 	enum LogReason log_reason;

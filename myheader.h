@@ -11,13 +11,19 @@
 * @return
 */
 
+/**
+* @brief	Creates and initializes a house structure.
+* @return	Pointer to the new house, or NULL on failure.
+*/
+struct House* create_house(void);
 
 /**
-* @brief	Creates and initializes a room structure.
-* @param[in] 	name: Name of the new room.
-* @return	Pointer to the new room, or NULL on failure.
+* @brief		Adds evidence to the shared case file.
+* @param[in, out]	casefile: The shared case file to update.
+* @param[in]		evidence: The evidence type to add.
+* @return
 */
-struct Room* create_room(const char* name);
+void casefile_add_evidence(struct CaseFile* casefile, enum EvidenceType evidence);
 
 /**
 * @brief	Connects two rooms.
@@ -28,13 +34,7 @@ struct Room* create_room(const char* name);
 int room_connect(struct Room* room1, struct Room* room2);
 
 /**
-* @brief	Creates and initializes a house structure.
-* @return	Pointer to the new house, or NULL on failure.
-*/
-struct House* create_house(void);
-
-/**
-* @brief		Adds evidence to a room.
+* @brief		Adds evidence to a room. (Used by ghost)
 * @param[in, out]	room: The room to add evidence to.
 * @param[in]		evidence: The type of evidence to add.
 */
@@ -56,6 +56,41 @@ void room_remove_evidence(struct Room* room, enum EvidenceType evidence);
 bool room_has_evidence(struct Room* room, enum EvidenceType evidence);
 
 /**
+* @brief		Removes a hunter from a room's hunter list.
+* @param[in, out]	room: The room to remove the hunter from.
+* @param[in]		hunter: The hunter to remove.
+*/
+void room_remove_hunter(struct Room* room, struct Hunter* hunter);
+
+/**
+* @brief		Adds a hunter to a room's hunter list.
+* @param[in,out]	room: The room to add the hunter to.
+* @param[in]		hunter: The hunter to add.
+* @return		true if successful, false if room is full.
+*/
+bool room_add_hunter(struct Room* room, struct Hunter* hunter);
+
+/**
+* @brief		Pushes a room onto a RoomStack.
+* @param[in, out]	stack: Pointer to the stack head.
+* @param[in]		room: Room to push onto the stack.
+*/
+void roomstack_push(RoomStack* stack, struct Room* room);
+
+/**
+* @brief		Pops a room from a RoomStack.
+* @param[in, out]	stack: Pointer to the stack head.
+* @return		The room popped from the stack, or NULL if empty.
+*/
+struct Room* roomstack_pop(RoomStack* stack);
+
+/**
+* @brief		Frees all nodes in a RoomStack.
+* @param[in,out]	stack: Pointer to the stack to clean up.
+*/
+void roomstack_cleanup(RoomStack* stack);
+
+/**
 * @brief	Creates and initializes a hunter.
 * @param[in]	name: The hunter's name.
 * @param[in]	id: The hunter's unique id.
@@ -65,6 +100,12 @@ bool room_has_evidence(struct Room* room, enum EvidenceType evidence);
 * @return	Pointer to the new hunter, or NULL on failure.
 */
 struct Hunter* create_hunter(const char* name, int id, struct Room* starting_room, enum EvidenceType device, struct CaseFile* casefile);
+
+/**
+* @brief		Simulates one turn of hunter behaviour.
+* @param[in, out]	hunter: The hunter taking their turn.
+*/
+void hunter_take_turn(struct Hunter* hunter);
 
 /**
 * @brief		Creates and initializes a ghost.

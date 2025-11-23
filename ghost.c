@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+/*
+	All function documentation is located in myheader.h
+*/
 
 struct Ghost* create_ghost(struct House* house) {
 	struct Ghost* ghost = malloc(sizeof(struct Ghost));	//Allocate memeory for new ghost
@@ -48,7 +51,7 @@ void ghost_take_turn(struct Ghost* ghost) {
 	switch (action) {
 		case 0:	//Idling
 			
-			log_ghost_idle(ghost->id, ghost->boredom, ghost->current_room->name);
+			log_ghost_idle(ghost->id, ghost->boredom, ghost->current_room->name);	//Log the ghost idling
 			break;
 			
 		case 1:	//Haunting

@@ -16,6 +16,8 @@ struct House* create_house(void) {
 	house->max_hunters = 4;
 	house->hunters = malloc(4*sizeof(struct Hunter*));
 	house->starting_room = NULL;
+	house->casefile.collected = 0;
+	house->casefile.solved = false;
 	
 	house_populate_rooms(house);
 	
