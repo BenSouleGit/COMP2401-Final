@@ -20,14 +20,14 @@ struct Hunter* create_hunter(const char* name, int id, struct Room* starting_roo
 	hunter->id = id;
 	hunter->fear = 0;
 	hunter->boredom = 0;
-	hunter->exited = false;			//Starting in van, but haven't "exited"
+	hunter->exited = false;				//Starting in van, but haven't "exited"
 	hunter->current_room = starting_room;
 	hunter->path = NULL;
 	roomstack_push(&hunter->path, starting_room);	//Star with the van on the stack
 	hunter->device = device;
 	hunter->casefile = casefile;
 	hunter->returning_to_van = false;
-	hunter->log_reason = LR_EVIDENCE;	//Default
+	hunter->log_reason = LR_BORED;			//Default log reason
 	
 	//Log the creation of the hunter
 	log_hunter_init(id, starting_room->name, name, device);
@@ -67,8 +67,8 @@ void hunter_take_turn(struct Hunter* hunter) {
 	if (hunter->current_room->is_exit) {		//Hunter is in the exit room
 		if (hunter->returning_to_van) {
 			if (evidence_is_valid_ghost(hunter->casefile->collected)) { //Hunter is returning because they've collected enough evidence to identify the ghost type
-				hunter->exited = true;
 				hunter->log_reason = LR_EVIDENCE;
+				hunter->exited = true;
 				
 				log_exit(hunter->id, hunter->boredom, hunter->fear, hunter->current_room->name, hunter->device, hunter->log_reason); //Log the exit
 				
@@ -120,10 +120,10 @@ void hunter_take_turn(struct Hunter* hunter) {
 		if (hunter->path != NULL) {	//Has rooms to backtrack to
 			struct Room* new_room = roomstack_pop(&hunter->path);	//Get previous room
 			
+			const char* from_room = hunter->current_room->name;
+			const char* to_room = new_room->name;
+			
 			if (room_add_hunter(new_room, hunter)) {	//Try to add to new room
-				const char* from_room = hunter->current_room->name;	//Store before removing
-				const char* to_room = new_room->name;
-				
 				room_remove_hunter(hunter->current_room, hunter);	//Remove from old room
 				
 				log_move(hunter->id, hunter->boredom, hunter->fear, from_room, to_room, hunter->device);
@@ -133,11 +133,11 @@ void hunter_take_turn(struct Hunter* hunter) {
 	} else { //Exploring
 		struct Room* new_room = hunter->current_room->connected_rooms[rand_int_threadsafe(0, hunter->current_room->num_connections)];	//Random connected room
 		
-		if (room_add_hunter(new_room, hunter)) {	//Try to add to new room
-			const char* from_room = hunter->current_room->name;	//Store before removing
-			const char* to_room = new_room->name;
-			struct Room* old_room = hunter->current_room;
-			
+		const char* from_room = hunter->current_room->name;
+		const char* to_room = new_room->name;
+		struct Room* old_room = hunter->current_room;
+		
+		if (room_add_hunter(new_room, hunter)) { //Try to add to new room
 			room_remove_hunter(old_room, hunter);	//Remove from old room
 			roomstack_push(&hunter->path, old_room);	//Store old room on stack
 			

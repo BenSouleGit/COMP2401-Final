@@ -65,6 +65,13 @@ void room_remove_evidence(struct Room* room, enum EvidenceType evidence);
 bool room_has_evidence(struct Room* room, enum EvidenceType evidence);
 
 /**
+* @brief	Finds the ghost type that matches the given evidence.
+* @param[in]	evidence: The collected evidence bitmask.
+* @return	The matching ghost type.
+*/
+const char* evidence_to_ghost_type(EvidenceByte evidence);
+
+/**
 * @brief		Removes a hunter from a room's hunter list.
 * @param[in, out]	room: The room to remove the hunter from.
 * @param[in]		hunter: The hunter to remove.
