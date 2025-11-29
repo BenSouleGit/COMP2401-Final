@@ -1,0 +1,23 @@
+#Compiled object files
+*.o
+
+#Executable files
+test
+*.exe
+*.out
+final
+
+#Python cache (for validate_logs.py)
+__pycache__/
+*.pyc
+
+#Log files
+*.csv
+
+#Temporary files
+*~
+*.swp
+*.swo
+
+#Build directories
+build/
