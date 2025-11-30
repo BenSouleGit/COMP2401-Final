@@ -35,6 +35,11 @@ bool house_add_hunter(struct House* house, struct Hunter* hunter);
 void casefile_add_evidence(struct CaseFile* casefile, enum EvidenceType evidence);
 
 /**
+* @brief        Locked variant (caller must hold room->mutex).
+*/
+void casefile_add_evidence_locked(struct CaseFile* casefile, enum EvidenceType evidence);
+
+/**
 * @brief	Connects two rooms.
 * @param[in]	room1: Pointer to first room.
 * @param[in]	room2: Pointer to second room.
@@ -55,6 +60,12 @@ void lock_rooms(struct Room* room1, struct Room* room2);
 * @param[in]	room2: Second room to unlock.
 */
 void unlock_rooms(struct Room* room1, struct Room* room2);
+
+/**
+* @brief	Cleans up a room's resources.
+* @param[in]	room: The room to clean up.
+*/
+void room_cleanup(struct Room* room);
 
 /**
 * @brief		Adds evidence to a room. (Used by ghost)
@@ -79,6 +90,13 @@ void room_remove_evidence(struct Room* room, enum EvidenceType evidence);
 bool room_has_evidence(struct Room* room, enum EvidenceType evidence);
 
 /**
+* @brief        Locked variants (caller must hold room->mutex).
+*/
+void room_add_evidence_locked(struct Room* room, enum EvidenceType evidence);
+void room_remove_evidence_locked(struct Room* room, enum EvidenceType evidence);
+bool room_has_evidence_locked(struct Room* room, enum EvidenceType evidence);
+
+/**
 * @brief	Finds the ghost type that matches the given evidence.
 * @param[in]	evidence: The collected evidence bitmask.
 * @return	The matching ghost type.
@@ -86,19 +104,25 @@ bool room_has_evidence(struct Room* room, enum EvidenceType evidence);
 const char* evidence_to_ghost_type(EvidenceByte evidence);
 
 /**
-* @brief		Removes a hunter from a room's hunter list.
-* @param[in, out]	room: The room to remove the hunter from.
-* @param[in]		hunter: The hunter to remove.
+* @brief        	Removes a hunter from a room's hunter list.
+* @param[in,out]	room: The room to remove the hunter from.
+* @param[in]    	hunter: The hunter to remove.
 */
 void room_remove_hunter(struct Room* room, struct Hunter* hunter);
 
 /**
-* @brief		Adds a hunter to a room's hunter list.
+* @brief        	Adds a hunter to a room's hunter list.
 * @param[in,out]	room: The room to add the hunter to.
-* @param[in]		hunter: The hunter to add.
-* @return		true if successful, false if room is full.
+* @param[in]    	hunter: The hunter to add.
+* @return       	true if successful, false if room is full.
 */
 bool room_add_hunter(struct Room* room, struct Hunter* hunter);
+
+/**
+* @brief        Locked variants (caller must hold room->mutex).
+*/
+bool room_add_hunter_locked(struct Room* room, struct Hunter* hunter);
+void room_remove_hunter_locked(struct Room* room, struct Hunter* hunter);
 
 /**
 * @brief		Pushes a room onto a RoomStack.

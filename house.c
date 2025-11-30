@@ -22,6 +22,8 @@ struct House* create_house(void) {
 	house->casefile.collected = 0;
 	house->casefile.solved = false;
 	
+	sem_init(&house->casefile.mutex, 0, 1);
+	
 	house_populate_rooms(house);
 	
 	return house;

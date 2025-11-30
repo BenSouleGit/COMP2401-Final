@@ -147,6 +147,14 @@ int main() {
 		roomstack_cleanup(&house->hunters[i]->path);
 		free(house->hunters[i]);
 	}
+	
+	//Destroy all room semaphores
+	for (int i=0; i < house->room_count; i++) {
+		room_cleanup(&house->rooms[i]);
+	}	
+	
+	sem_destroy(&house->casefile.mutex);	//Destroy casefile semaphore
+	
 	free(house->hunters);	//Free hunter array
 	free(ghost);		//Free ghost
 	free(house);		//Free house

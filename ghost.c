@@ -34,7 +34,10 @@ struct Ghost* create_ghost(struct House* house) {
 
 void ghost_take_turn(struct Ghost* ghost) {	
 	//Hunter check
-	if (ghost->current_room->num_hunters > 0) {
+	sem_wait(&ghost->current_room->mutex);
+	bool has_hunters = (ghost->current_room->num_hunters > 0);
+	
+	if (has_hunters) {
 		ghost->boredom = 0;	//Reset boredom
 	} else {
 		ghost->boredom++;	//Increase boredom
@@ -43,17 +46,24 @@ void ghost_take_turn(struct Ghost* ghost) {
 	//Exit conditions
 	if (ghost->boredom > ENTITY_BOREDOM_MAX) {
 		ghost->exited = true;
-		log_ghost_exit(ghost->id, ghost->boredom, ghost->current_room->name);	//Log the ghost exiting
 		ghost->current_room->ghost = NULL;
+		
+	}
+	sem_post(&ghost->current_room->mutex);
+	
+	if (ghost->exited) {
+		log_ghost_exit(ghost->id, ghost->boredom, ghost->current_room->name);	//Log the ghost exiting
 		return;
 	}
 	
+	
 	//Take action
+	struct Room* old_room = ghost->current_room;
 	int action = rand_int_threadsafe(0, 3);
 	switch (action) {
 		case 0:	//Idling
 			
-			log_ghost_idle(ghost->id, ghost->boredom, ghost->current_room->name);	//Log the ghost idling
+			log_ghost_idle(ghost->id, ghost->boredom, old_room->name);	//Log the ghost idling
 			break;
 			
 		case 1:	//Haunting
@@ -75,30 +85,53 @@ void ghost_take_turn(struct Ghost* ghost) {
 			
 			
 			//Pick one of the three possible evidence types randomly
-			enum EvidenceType chosen_evidence = ghost_evidence[rand_int_threadsafe(0, 3)];
+			enum EvidenceType chosen_evidence = ghost_evidence[rand_int_threadsafe(0, count)];
 			
-			room_add_evidence(ghost->current_room, chosen_evidence);					//Add the evidence
-			log_ghost_evidence(ghost->id, ghost->boredom, ghost->current_room->name, chosen_evidence);	//Log the added evidence
+			sem_wait(&old_room->mutex);
+			room_add_evidence_locked(old_room, chosen_evidence);	//Add the evidence
+			sem_post(&old_room->mutex);
+			
+			log_ghost_evidence(ghost->id, ghost->boredom, old_room->name, chosen_evidence);	//Log the added evidence
 			
 			break;
 			
 		case 2: //Moving
 			
-			if (ghost->current_room->num_hunters == 0) {	//Movement allowed
-				
-				const char* old_room_name = ghost->current_room->name;	//Track old room name for logging
-				
-				//Select a random connected room	
-				int new_room_int = rand_int_threadsafe(0, ghost->current_room->num_connections);
-				struct Room* new_room = ghost->current_room->connected_rooms[new_room_int];
-				
-				//Update pointers
-				ghost->current_room->ghost = NULL;	
-				new_room->ghost = ghost;		
-				ghost->current_room = new_room;		
-				
-				log_ghost_move(ghost->id, ghost->boredom, old_room_name, ghost->current_room->name);	//Log the ghost movement
+			sem_wait(&old_room->mutex);	//Lock current room first
+    
+			//Check if can move while holding lock
+			if (old_room->num_hunters > 0) {
+				sem_post(&old_room->mutex);
+				break;  //Don't move - hunters present
 			}
+			
+			//Select random room while holding lock
+			int new_room_int = rand_int_threadsafe(0, old_room->num_connections);
+			struct Room* new_room = old_room->connected_rooms[new_room_int];
+    
+			//Save names for logging before modifying
+			const char* old_room_name = old_room->name;
+			const char* new_room_name = new_room->name;
+    
+			//If same room, just stay (don't need to lock twice)
+			if (old_room == new_room) {
+				sem_post(&old_room->mutex);
+				break;
+			}
+    
+			sem_wait(&new_room->mutex);	//Lock the destination room
+    
+			//Move the ghost
+			old_room->ghost = NULL;
+			new_room->ghost = ghost;
+			ghost->current_room = new_room;
+    
+			//Unlock both rooms
+			sem_post(&new_room->mutex);
+			sem_post(&old_room->mutex);
+    
+			//Log after unlocking
+			log_ghost_move(ghost->id, ghost->boredom, old_room_name, new_room_name);
 			break;
 	}
 	
